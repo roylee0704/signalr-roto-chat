@@ -29,8 +29,18 @@
 
 
     // Declare a proxy to reference the hub.
-    var socket = $.connection.chatHub;
-
+    var connection = {};
+    connection.hub = $.hubConnection();
+    connection.proxy = connection.hub.createHubProxy('chatHub');
+    //// Start the connection.
+    connection.hub.start().done(function () {
+        //    $('#sendmessage').click(function () {
+        //        // Call the Send method on the hub.
+        //        socket.server.send($('#displayname').val(), $('#message').val());
+        //        // Clear text box and reset focus for next comment.
+        //        $('#message').val('').focus();
+        //    });
+    });
     function addParticipantsMessage(data) {
         var message = '';
         if (data.numUsers === 1) {
@@ -54,7 +64,7 @@
             $currentInput = $inputMessage.focus();
 
             // Tell the server your username
-            socket.server.addUser(username);
+            connection.proxy.invoke('addUser', username);
         }
     }
 
@@ -71,7 +81,7 @@
                 message: message
             });
             // tell server to execute 'new message' and send along one parameter
-            socket.server.newMessage(message);
+            connection.proxy.invoke('newMessage', message);
         }
     }
 
@@ -165,7 +175,7 @@
         if (connected) {
             if (!typing) {
                 typing = true;
-                socket.server.typing();
+                connection.proxy.invoke('typing');
             }
             lastTypingTime = (new Date()).getTime();
 
@@ -173,7 +183,7 @@
                 var typingTimer = (new Date()).getTime();
                 var timeDiff = typingTimer - lastTypingTime;
                 if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
-                    socket.server.stopTyping();
+                    connection.proxy.invoke('stopTyping');
                     typing = false;
                 }
             }, TYPING_TIMER_LENGTH);
@@ -212,7 +222,7 @@
         if (event.which === 13) {
             if (username) {
                 sendMessage();
-                socket.server.stopTyping();
+                connection.proxy.invoke('stopTyping');
                 typing = false;
             } else {
                 setUsername();
@@ -237,10 +247,20 @@
         $inputMessage.focus();
     });
 
+
+
+
+
+
+
+
+
+
+
     // Socket events
 
     // Whenever the server emits 'login', log the login message
-    socket.client.login = function (data) {
+    connection.proxy.on('login', function (data) {
         connected = true;
         // Display the welcome message
         var message = "Welcome to Roto Chat – ";
@@ -248,46 +268,31 @@
             prepend: true
         });
         addParticipantsMessage(data);
-    };
-
-
+    });
 
     // Whenever the server emits 'new message', update the chat body
-    socket.client.newMessage = function (data) {
+    connection.proxy.on('newMessage', function (data) {
 
         console.log(data);
         addChatMessage(data);
-    };
+    });
 
     // Whenever the server emits 'user joined', log it in the chat body
-    socket.client.userJoined = function (data) {
+    connection.proxy.on('userJoined', function (data) {
         log(data.username + ' joined');
         addParticipantsMessage(data);
-    };
+    });
 
     // Whenever the server emits 'user left', log it in the chat body
-    socket.client.userLeft = function (data) {
+    connection.proxy.on('userLeft', function (data) {
         log(data.username + ' left');
         addParticipantsMessage(data);
         removeChatTyping(data);
-    };
+    });
 
     // Whenever the server emits 'typing', show the typing message
-    socket.client.Typing = function (data) {
+    connection.proxy.on('Typing', function (data) {
         addChatTyping(data);
-    };
-
-
-
-
-
-    //// Start the connection.
-    $.connection.hub.start().done(function () {
-    //    $('#sendmessage').click(function () {
-    //        // Call the Send method on the hub.
-    //        socket.server.send($('#displayname').val(), $('#message').val());
-    //        // Clear text box and reset focus for next comment.
-    //        $('#message').val('').focus();
-    //    });
     });
+
 });

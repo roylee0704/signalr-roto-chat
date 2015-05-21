@@ -1,0 +1,37 @@
+{
+  "name": "angular-signalr",
+  "version": "0.1.0",
+  "authors": [
+    "Roy Lee <roylee0704@gmail.com>"
+  ],
+  "description": "Signalr.NET component for AngularJS.",
+  "keywords": [
+    "angular",
+    "signalr"
+  ],
+  "license": "MIT",
+  "ignore": [],
+  "main": [
+    "./angular-signalr.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:roylee0704/angular-signalr.git"
+  },
+  "dependencies": {
+    "angular": "*",
+    "jquery": "*",
+    "signalr": "*"
+  },
+  "homepage": "https://github.com/roylee0704/bower-angular-signalr",
+  "_release": "0.1.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "v0.1.0",
+    "commit": "546256d5b633f91ac9c15c6dc5d5fba6068519a3"
+  },
+  "_source": "git://github.com/roylee0704/bower-angular-signalr.git",
+  "_target": "~0.1.0",
+  "_originalSource": "angular-signalr",
+  "_direct": true
+}
